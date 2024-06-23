@@ -7,5 +7,5 @@ RUN gradle build --no-daemon
 # Use the official OpenJDK image to run the app
 FROM openjdk:11-jre-slim
 WORKDIR /app
-COPY --from=builder /app/build/libs/demo-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=builder /app/build/libs/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]

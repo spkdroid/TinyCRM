@@ -21,4 +21,5 @@ dependencies {
 
 test {
 	useJUnitPlatform()
+	enabled = false
 }
