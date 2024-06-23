@@ -32,6 +32,12 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/support_module
       SPRING_DATASOURCE_USERNAME: app_user
       SPRING_DATASOURCE_PASSWORD: app_password
-
+      
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:80"
+  
 volumes:
   mysql_data:
