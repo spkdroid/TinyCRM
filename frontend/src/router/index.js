@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Home from '../components/Home.vue';
+import Home from '../components/HelloWorld.vue';
 import FileTicket from '../components/FileTicket.vue';
-import TicketComments from '../components/TicketComments.vue';
+import TicketComments from '../components/TicketComment.vue';
 
 const routes = [
   {
@@ -10,12 +10,12 @@ const routes = [
     component: Home,
   },
   {
-    path: '/file-ticket',
+    path: '/file',
     name: 'FileTicket',
     component: FileTicket,
   },
   {
-    path: '/ticket-comments',
+    path: '/ticket',
     name: 'TicketComments',
     component: TicketComments,
   },
