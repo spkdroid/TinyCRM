@@ -2,6 +2,12 @@
 
 TinyCRM is a lightweight Customer Relationship Management (CRM) system that focuses on interaction management, support tickets, and ticket comments. This project is built using Spring Boot for the backend and Vue.js for the frontend, with MySQL as the database.
 
+<h1 align="center" style="text-align: center; padding-bottom: 20px;">
+  <br>
+ <img src="https://github.com/spkdroid/TinyCRM/blob/master/img/logo.png" alt="Icon" width="220"/>
+</h1>
+
+
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
