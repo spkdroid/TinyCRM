@@ -38,4 +38,14 @@ public class SupportTicketService {
     public void deleteTicket(Long id) {
         supportTicketRepository.deleteById(id);
     }
+
+    public SupportTicket updateTicketStatus(Long id, String status) {
+        Optional<SupportTicket> optionalTicket = supportTicketRepository.findById(id);
+        if (optionalTicket.isPresent()) {
+            SupportTicket ticket = optionalTicket.get();
+            ticket.setStatus(status);
+            return supportTicketRepository.save(ticket);
+        }
+        return null;
+    }
 }

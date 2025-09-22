@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tickets")
@@ -35,6 +36,19 @@ public class SupportTicketController {
     @PutMapping("/{id}")
     public ResponseEntity<SupportTicket> updateTicket(@PathVariable Long id, @RequestBody SupportTicket supportTicket) {
         SupportTicket updatedTicket = supportTicketService.updateTicket(id, supportTicket);
+        if (updatedTicket != null) {
+            return ResponseEntity.ok(updatedTicket);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }    @PatchMapping("/{id}/status")
+    public ResponseEntity<SupportTicket> updateTicketStatus(@PathVariable Long id, @RequestBody java.util.Map<String, String> statusUpdate) {
+        String newStatus = statusUpdate.get("status");
+        if (newStatus == null || newStatus.trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        SupportTicket updatedTicket = supportTicketService.updateTicketStatus(id, newStatus);
         if (updatedTicket != null) {
             return ResponseEntity.ok(updatedTicket);
         } else {
