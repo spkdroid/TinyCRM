@@ -10,6 +10,18 @@
           <label for="description">Description:</label>
           <textarea id="description" v-model="description" required></textarea>
         </div>
+        <div>
+          <label for="priority">Priority:</label>
+          <select id="priority" v-model="priority" required>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+          </select>
+        </div>
+        <div>
+          <label for="category">Category:</label>
+          <input type="text" id="category" v-model="category" required />
+        </div>
         <button type="submit">Submit</button>
       </form>
     </div>
@@ -22,6 +34,8 @@
       return {
         title: '',
         description: '',
+        priority: 'Medium',
+        category: '',
       };
     },
     methods: {
@@ -33,8 +47,10 @@
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            title: this.title,
+            subject: this.title,
             description: this.description,
+            priority: this.priority,
+            category: this.category,
           }),
         });
   
@@ -42,6 +58,8 @@
           alert('Ticket filed successfully');
           this.title = '';
           this.description = '';
+          this.priority = 'Medium';
+          this.category = '';
         } else {
           alert('Failed to file ticket');
         }
@@ -53,4 +71,3 @@
   <style>
   /* Add styles for the form */
   </style>
-  

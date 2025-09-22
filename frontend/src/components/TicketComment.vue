@@ -1,5 +1,12 @@
 <template>
     <div>
+      <h1>Ticket Details</h1>
+      <div v-if="ticket">
+        <p><strong>Subject:</strong> {{ ticket.subject }}</p>
+        <p><strong>Status:</strong> {{ ticket.status }}</p>
+        <p><strong>Priority:</strong> {{ ticket.priority }}</p>
+        <p><strong>Category:</strong> {{ ticket.category }}</p>
+      </div>
       <h1>Ticket Comments</h1>
       <ul>
         <li v-for="comment in comments" :key="comment.id">{{ comment.text }}</li>
@@ -19,14 +26,21 @@
     name: 'TicketComments',
     data() {
       return {
+        ticket: null,
         comments: [],
         newComment: '',
       };
     },
     async created() {
       // Replace with your API endpoint and ticket ID
-      const response = await fetch('http://localhost:8080/api/tickets/1/comments');
-      this.comments = await response.json();
+      const ticketResponse = await fetch('http://localhost:8080/api/tickets/1');
+      if (ticketResponse.ok) {
+        this.ticket = await ticketResponse.json();
+      }
+      const commentsResponse = await fetch('http://localhost:8080/api/tickets/1/comments');
+      if (commentsResponse.ok) {
+        this.comments = await commentsResponse.json();
+      }
     },
     methods: {
       async addComment() {
@@ -56,4 +70,3 @@
   <style>
   /* Add styles for the comments section */
   </style>
-  

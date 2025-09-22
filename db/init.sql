@@ -24,6 +24,8 @@ CREATE TABLE support_tickets (
     date_created DATETIME,
     status VARCHAR(50) DEFAULT 'open',
     assigned_to INT,
+    priority VARCHAR(20),
+    category VARCHAR(50),
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (assigned_to) REFERENCES users(id)
 );
