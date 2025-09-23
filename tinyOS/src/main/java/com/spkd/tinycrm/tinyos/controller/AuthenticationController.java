@@ -73,6 +73,26 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> register(@RequestBody User user) {
         try {
+            // Log the registration attempt
+            System.out.println("Registration attempt for user: " + user.getUsername() + ", email: " + user.getEmail());
+            
+            // Validate required fields
+            if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+                throw new RuntimeException("Username is required");
+            }
+            if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
+                throw new RuntimeException("Email is required");
+            }
+            if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
+                throw new RuntimeException("Password is required");
+            }
+            if (user.getFirstName() == null || user.getFirstName().trim().isEmpty()) {
+                throw new RuntimeException("First name is required");
+            }
+            if (user.getLastName() == null || user.getLastName().trim().isEmpty()) {
+                throw new RuntimeException("Last name is required");
+            }
+
             User registeredUser = authenticationService.registerUser(user);
             
             Map<String, Object> response = new HashMap<>();
@@ -82,9 +102,12 @@ public class AuthenticationController {
             
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            System.err.println("Registration error: " + e.getMessage());
+            e.printStackTrace();
+            
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
-            response.put("message", e.getMessage());
+            response.put("message", e.getMessage() != null ? e.getMessage() : "Registration failed");
             return ResponseEntity.badRequest().body(response);
         }
     }
