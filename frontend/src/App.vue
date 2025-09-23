@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <el-container class="app-container">
+    <!-- Show login page or main app based on authentication -->
+    <router-view v-if="$route.name === 'Login'" />
+    
+    <el-container v-else class="app-container">
       <!-- Header -->
       <el-header class="app-header">
         <div class="header-left">
@@ -8,19 +11,20 @@
           <h1 class="app-title">TinyCRM Enterprise</h1>
         </div>
         <div class="header-right">
-          <el-dropdown>
+          <span class="user-name">{{ currentUser?.firstName || currentUser?.username }}</span>
+          <el-dropdown @command="handleUserAction">
             <el-avatar :size="40" :src="userAvatar" />
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item>
+                <el-dropdown-item command="profile">
                   <el-icon><User /></el-icon>
                   Profile
                 </el-dropdown-item>
-                <el-dropdown-item>
+                <el-dropdown-item command="settings">
                   <el-icon><Setting /></el-icon>
                   Settings
                 </el-dropdown-item>
-                <el-dropdown-item divided>
+                <el-dropdown-item command="logout" divided>
                   <el-icon><SwitchButton /></el-icon>
                   Logout
                 </el-dropdown-item>
@@ -39,7 +43,7 @@
             router
             unique-opened
           >
-            <el-menu-item index="/">
+            <el-menu-item index="/dashboard">
               <el-icon><HomeFilled /></el-icon>
               <span>Dashboard</span>
             </el-menu-item>
@@ -76,11 +80,81 @@
 </template>
 
 <script>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import axios from 'axios'
+
 export default {
   name: 'App',
-  data() {
+  setup() {
+    const router = useRouter()
+    const currentUser = ref(null)
+    const userAvatar = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png')
+
+    const loadCurrentUser = () => {
+      const userData = localStorage.getItem('user')
+      if (userData) {
+        currentUser.value = JSON.parse(userData)
+      }
+    }
+
+    const handleUserAction = async (command) => {
+      switch (command) {
+        case 'profile':
+          ElMessage.info('Profile feature coming soon!')
+          break
+        case 'settings':
+          router.push('/settings')
+          break
+        case 'logout':
+          try {
+            const result = await ElMessageBox.confirm(
+              'Are you sure you want to logout?',
+              'Confirm Logout',
+              {
+                confirmButtonText: 'Yes, Logout',
+                cancelButtonText: 'Cancel',
+                type: 'warning'
+              }
+            )
+            
+            if (result === 'confirm') {
+              await logout()
+            }
+          } catch (error) {
+            // User cancelled
+          }
+          break
+      }
+    }
+
+    const logout = async () => {
+      try {
+        await axios.post('/api/auth/logout')
+      } catch (error) {
+        console.error('Logout error:', error)
+      } finally {
+        // Clear local storage
+        localStorage.removeItem('user')
+        localStorage.removeItem('sessionToken')
+        currentUser.value = null
+        
+        // Redirect to login
+        router.push('/')
+        
+        ElMessage.success('Logged out successfully')
+      }
+    }
+
+    onMounted(() => {
+      loadCurrentUser()
+    })
+
     return {
-      userAvatar: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+      currentUser,
+      userAvatar,
+      handleUserAction
     }
   }
 }
@@ -135,6 +209,13 @@ body {
 .header-right {
   display: flex;
   align-items: center;
+  gap: 12px;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
 }
 
 .app-sidebar {

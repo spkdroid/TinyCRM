@@ -15,9 +15,14 @@ public class SupportTicket {
     private String status;
     private String priority;
     private String category;
+    private String createdBy;
+    private String assignedTo;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
+    
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedDate;
 
 
     public Long getId() {
@@ -76,4 +81,27 @@ public class SupportTicket {
         this.createdDate = createdDate;
     }
 
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getAssignedTo() {
+        return assignedTo;
+    }
+
+    public void setAssignedTo(String assignedTo) {
+        this.assignedTo = assignedTo;
+    }
+
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
 }
