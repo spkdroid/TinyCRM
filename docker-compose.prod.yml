@@ -1,0 +1,66 @@
+# Production overrides for docker-compose.yml
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+  database:
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  backend:
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - LOGGING_LEVEL_COM_SPKD_TINYCRM=WARN
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=WARN
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  frontend:
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+        reservations:
+          memory: 128M
+          cpus: '0.25'
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"

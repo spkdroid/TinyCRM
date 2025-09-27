@@ -14,21 +14,21 @@
           </el-button>
           <el-dropdown @command="handleQuickAction" class="quick-menu">
             <el-button type="info" plain>
-              <el-icon><i class="el-icon-more-filled"></i></el-icon>
+              <el-icon><MoreFilled /></el-icon>
               Quick Actions
             </el-button>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="export">
-                  <el-icon><i class="el-icon-download"></i></el-icon>
+                  <el-icon><Download /></el-icon>
                   Export Data
                 </el-dropdown-item>
                 <el-dropdown-item command="import">
-                  <el-icon><i class="el-icon-upload"></i></el-icon>
+                  <el-icon><Upload /></el-icon>
                   Import Data
                 </el-dropdown-item>
                 <el-dropdown-item command="settings" divided>
-                  <el-icon><i class="el-icon-setting"></i></el-icon>
+                  <el-icon><Setting /></el-icon>
                   Settings
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -380,11 +380,57 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 import { ElMessage, ElNotification } from 'element-plus'
+import {
+  Plus,
+  MoreFilled,
+  Download,
+  Upload,
+  Setting,
+  Tickets,
+  CaretTop,
+  CaretBottom,
+  Warning,
+  Loading,
+  CircleCheck,
+  Timer,
+  Star,
+  Trophy,
+  ArrowRight,
+  Document,
+  User,
+  DocumentAdd,
+  View,
+  DataAnalysis,
+  Monitor
+} from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
 import axios from 'axios'
 
 export default {
   name: 'DashboardView',
+  components: {
+    Plus,
+    MoreFilled,
+    Download,
+    Upload,
+    Setting,
+    Tickets,
+    CaretTop,
+    CaretBottom,
+    Warning,
+    Loading,
+    CircleCheck,
+    Timer,
+    Star,
+    Trophy,
+    ArrowRight,
+    Document,
+    User,
+    DocumentAdd,
+    View,
+    DataAnalysis,
+    Monitor
+  },
   data() {
     return {
       // Ticket statistics

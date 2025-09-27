@@ -1,0 +1,52 @@
+# Ignore node modules and build artifacts
+node_modules/
+dist/
+build/
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignore environment files (will be handled by Docker Compose)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Ignore documentation
+README.md
+*.md
+
+# Ignore Docker files
+Dockerfile*
+.dockerignore
+
+# Ignore Git
+.git/
+.gitignore
+
+# Ignore coverage and test files
+coverage/
+.nyc_output/
+test/
+tests/
+__tests__/
+
+# Ignore cache
+.cache/
+.parcel-cache/
+.eslintcache

@@ -1,0 +1,34 @@
+# Development overrides for docker-compose.yml
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  database:
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=dev-root-password
+      - MYSQL_DATABASE=support_module_dev
+      - MYSQL_USER=dev_user
+      - MYSQL_PASSWORD=dev-password
+
+  backend:
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - LOGGING_LEVEL_COM_SPKD_TINYCRM=DEBUG
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=DEBUG
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info,metrics,env,beans
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+    volumes:
+      - ./tinyOS/src:/app/src:ro
+      - backend_logs:/app/logs
+    ports:
+      - "8080:8080"
+      - "5005:5005"  # Debug port
+    command: ["sh", "-c", "java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar app.jar"]
+
+  frontend:
+    environment:
+      - NODE_ENV=development
+      - VUE_APP_API_BASE_URL=http://localhost:8080
+    ports:
+      - "3000:8080"

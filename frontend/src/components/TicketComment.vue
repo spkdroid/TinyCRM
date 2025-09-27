@@ -14,7 +14,14 @@
       <form @submit.prevent="addComment">
         <div>
           <label for="comment">Add Comment:</label>
-          <textarea id="comment" v-model="newComment" required></textarea>
+          <el-input
+            id="comment"
+            type="textarea"
+            v-model="newComment"
+            :rows="4"
+            required
+            placeholder="Type your comment here..."
+          />
         </div>
         <button type="submit">Submit</button>
       </form>

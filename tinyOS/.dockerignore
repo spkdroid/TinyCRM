@@ -1,0 +1,42 @@
+# Ignore build artifacts
+build/
+.gradle/
+bin/
+out/
+
+# Ignore IDE files
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.classpath
+.project
+.settings/
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore logs
+*.log
+logs/
+
+# Ignore temporary files
+*.tmp
+*.temp
+*.swp
+*.bak
+
+# Ignore documentation that's not needed in container
+README.md
+HELP.md
+*.md
+
+# Ignore Docker files
+Dockerfile*
+.dockerignore
+
+# Ignore Git
+.git/
+.gitignore

@@ -1,43 +1,114 @@
-version: '3.8'
-
 networks:
-  mynetwork:
+  tinycrm-network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
 
 services:
-  mysql:
-    image: mysql:5.7
-    container_name: mysql-container
+  # MySQL Database
+  database:
+    image: mysql:8.0
+    container_name: tinycrm-database
     restart: unless-stopped
+    networks:
+      - tinycrm-network
     environment:
-      MYSQL_ROOT_PASSWORD: my-secret-pw
-      MYSQL_DATABASE: support_module
-      MYSQL_USER: app_user
-      MYSQL_PASSWORD: app_password
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-my-secret-pw}
+      MYSQL_DATABASE: ${DB_NAME:-support_module}
+      MYSQL_USER: ${DB_USER:-app_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-app_password}
+      MYSQL_ROOT_HOST: '%'
     ports:
-      - "3306:3306"
+      - "${DB_PORT:-3306}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./db/mysql.cnf:/etc/mysql/conf.d/mysql.cnf:ro
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-my-secret-pw}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
-  springboot-app:
-    build: ./tinyOS
-    container_name: springboot-app
+  # Spring Boot Backend
+  backend:
+    build: 
+      context: ./tinyOS
+      dockerfile: Dockerfile
+    container_name: tinycrm-backend
     restart: unless-stopped
-    ports:
-      - "8080:8080"
-    depends_on:
-      - mysql
+    networks:
+      - tinycrm-network
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/support_module
-      SPRING_DATASOURCE_USERNAME: app_user
-      SPRING_DATASOURCE_PASSWORD: app_password
+      # Database configuration
+      SPRING_DATASOURCE_URL: jdbc:mysql://database:3306/${DB_NAME:-support_module}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: ${DB_USER:-app_user}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-app_password}
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
       
-  frontend:
-    build: ./frontend
-    container_name: frontend
+      # JPA/Hibernate configuration
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: false
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQL8Dialect
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: true
+      
+      # Server configuration
+      SERVER_PORT: 8080
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILE:-docker}
+      
+      # CORS configuration
+      CORS_ALLOWED_ORIGINS: http://localhost:3000,http://frontend:8080
+      
+      # Actuator configuration
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info,metrics
+      MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: when_authorized
+      
+      # Logging
+      LOGGING_LEVEL_COM_SPKD_TINYCRM: ${LOG_LEVEL:-INFO}
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY: ${LOG_LEVEL:-INFO}
+      
     ports:
-      - "3000:80"
-  
+      - "${BACKEND_PORT:-8080}:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 40s
+    volumes:
+      - backend_logs:/app/logs
+
+  # Vue.js Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: tinycrm-frontend
+    restart: unless-stopped
+    networks:
+      - tinycrm-network
+    environment:
+      - NODE_ENV=production
+      - BACKEND_URL=http://backend:8080
+    ports:
+      - "${FRONTEND_PORT:-3000}:8080"
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
 volumes:
   mysql_data:
+    driver: local
+  backend_logs:
+    driver: local
