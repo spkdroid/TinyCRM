@@ -3,11 +3,24 @@
     <!-- Enhanced Page Header -->
     <div class="page-header">
       <div class="header-content">
+        <div class="header-left">
+          <div class="logo-section">
+            <img src="/logo.png" alt="TinyCRM" class="dashboard-logo" />
+            <div class="brand-text">
+              <span class="brand-name">TinyCRM</span>
+              <span class="brand-subtitle">Enterprise CRM</span>
+            </div>
+          </div>
+        </div>
         <div class="header-text">
           <h2>Dashboard Overview</h2>
           <p>Welcome back, {{ currentUser?.firstName || 'User' }}! Here's what's happening in your CRM.</p>
         </div>
         <div class="header-actions">
+          <el-button type="success" plain @click="navigateToAbout" class="header-btn">
+            <el-icon><InfoFilled /></el-icon>
+            About
+          </el-button>
           <el-button type="primary" @click="navigateToCreateTicket" class="header-btn">
             <el-icon><Plus /></el-icon>
             New Ticket
@@ -560,6 +573,9 @@ export default {
     navigateToCreateTicket() {
       this.$router.push('/file')
     },
+    navigateToAbout() {
+      this.$router.push('/about')
+    },
     navigateToReports() {
       this.$router.push('/reports/overview')
     },
@@ -658,6 +674,50 @@ export default {
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 24px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dashboard-logo {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  background: white;
+  padding: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.dashboard-logo:hover {
+  transform: scale(1.05);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-name {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #667eea;
+  line-height: 1.2;
+}
+
+.brand-subtitle {
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 500;
 }
 
 .header-text h2 {

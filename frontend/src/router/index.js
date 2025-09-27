@@ -4,6 +4,7 @@ import DashboardView from '../components/Dashboard.vue';
 import FileTicket from '../components/FileTicket.vue';
 import TicketsList from '../components/TicketsList.vue';
 import TicketComments from '../components/TicketComment.vue';
+import About from '../components/About.vue';
 
 const routes = [
   {
@@ -33,6 +34,12 @@ const routes = [
     path: '/ticket/:id?',
     name: 'TicketComments',
     component: TicketComments,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/about',
+    name: 'About',
+    component: About,
     meta: { requiresAuth: true },
   },
   {
