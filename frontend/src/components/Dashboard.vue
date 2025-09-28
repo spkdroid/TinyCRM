@@ -5,10 +5,16 @@
       <div class="header-content">
         <div class="header-left">
           <div class="logo-section">
-            <img src="/logo.png" alt="TinyCRM" class="dashboard-logo" />
+            <div class="app-icon-dash">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="32" height="32" rx="3" fill="#0078d4"/>
+                <path d="M8 10h16v2H8v-2zm0 4h14v2H8v-2zm0 4h12v2H8v-2z" fill="white"/>
+                <circle cx="24" cy="22" r="3" fill="white"/>
+              </svg>
+            </div>
             <div class="brand-text">
               <span class="brand-name">TinyCRM</span>
-              <span class="brand-subtitle">Enterprise CRM</span>
+              <span class="brand-subtitle">Customer Management</span>
             </div>
           </div>
         </div>
@@ -17,16 +23,20 @@
           <p>Welcome back, {{ currentUser?.firstName || 'User' }}! Here's what's happening in your CRM.</p>
         </div>
         <div class="header-actions">
-          <el-button type="success" plain @click="navigateToAbout" class="header-btn">
+          <el-button type="info" plain @click="navigateToProfile" class="tinycrm-btn tinycrm-btn-secondary tinycrm-btn-medium">
+            <el-icon><User /></el-icon>
+            Profile
+          </el-button>
+          <el-button type="success" plain @click="navigateToAbout" class="tinycrm-btn tinycrm-btn-secondary tinycrm-btn-medium">
             <el-icon><InfoFilled /></el-icon>
             About
           </el-button>
-          <el-button type="primary" @click="navigateToCreateTicket" class="header-btn">
+          <el-button type="primary" @click="navigateToCreateTicket" class="tinycrm-btn tinycrm-btn-primary tinycrm-btn-medium">
             <el-icon><Plus /></el-icon>
             New Ticket
           </el-button>
           <el-dropdown @command="handleQuickAction" class="quick-menu">
-            <el-button type="info" plain>
+            <el-button type="info" plain class="tinycrm-btn tinycrm-btn-secondary tinycrm-btn-medium">
               <el-icon><i class="el-icon-more-filled"></i></el-icon>
               Quick Actions
             </el-button>
@@ -220,7 +230,7 @@
             <div v-if="recentTickets.length === 0" class="empty-state">
               <el-icon size="48" class="empty-icon"><Document /></el-icon>
               <p>No recent tickets found</p>
-              <el-button type="primary" @click="navigateToCreateTicket">Create Your First Ticket</el-button>
+              <el-button type="primary" @click="navigateToCreateTicket" class="tinycrm-btn tinycrm-btn-primary tinycrm-btn-medium">Create Your First Ticket</el-button>
             </div>
           </div>
         </el-card>
@@ -235,7 +245,7 @@
                 <el-icon class="card-icon"><User /></el-icon>
                 <span class="card-title">User Management</span>
               </div>
-              <el-button type="primary" size="small" @click="showCreateUserDialog" class="create-user-btn">
+              <el-button type="primary" @click="showCreateUserDialog" class="tinycrm-btn tinycrm-btn-primary tinycrm-btn-small">
                 <el-icon><Plus /></el-icon>
                 Add User
               </el-button>
@@ -341,8 +351,8 @@
       </el-form>
       <template #footer>
         <div class="dialog-footer">
-          <el-button @click="createUserVisible = false">Cancel</el-button>
-          <el-button type="primary" @click="handleCreateUser" :loading="createUserLoading">
+          <el-button @click="createUserVisible = false" class="tinycrm-btn tinycrm-btn-default tinycrm-btn-medium">Cancel</el-button>
+          <el-button type="primary" @click="handleCreateUser" :loading="createUserLoading" class="tinycrm-btn tinycrm-btn-primary tinycrm-btn-medium">
             Create User
           </el-button>
         </div>
@@ -576,6 +586,9 @@ export default {
     navigateToAbout() {
       this.$router.push('/about')
     },
+    navigateToProfile() {
+      this.$router.push('/profile')
+    },
     navigateToReports() {
       this.$router.push('/reports/overview')
     },
@@ -658,15 +671,18 @@ export default {
 .dashboard {
   padding: 0;
   min-height: calc(100vh - 120px);
+  background: #faf9f8;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Enhanced Page Header */
 .page-header {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-  border-radius: 20px;
-  padding: 32px;
-  margin-bottom: 32px;
-  border: 1px solid rgba(102, 126, 234, 0.1);
+  background: #ffffff;
+  border: 1px solid #d1d1d1;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
 .header-content {
@@ -743,12 +759,172 @@ export default {
   align-items: center;
 }
 
-.header-btn {
-  height: 48px;
-  padding: 0 24px;
-  border-radius: 16px;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+/* Windows Fluent Design Button System */
+.tinycrm-btn {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 8px 16px;
+  min-width: 80px;
+  height: 32px;
+  background: transparent;
+  color: #323130;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  outline: none;
+  position: relative;
+  user-select: none;
+}
+
+/* Button Sizes */
+.tinycrm-btn-small {
+  height: 24px;
+  padding: 4px 12px;
+  font-size: 12px;
+  min-width: 64px;
+}
+
+.tinycrm-btn-medium {
+  height: 32px;
+  padding: 8px 16px;
+  font-size: 14px;
+  min-width: 80px;
+}
+
+.tinycrm-btn-large {
+  height: 40px;
+  padding: 10px 20px;
+  font-size: 14px;
+  min-width: 120px;
+}
+
+/* Windows Primary Button */
+.tinycrm-btn-primary {
+  background-color: #0078d4;
+  border-color: #0078d4;
+  color: #ffffff;
+}
+
+.tinycrm-btn-primary:hover {
+  background-color: #106ebe;
+  border-color: #106ebe;
+}
+
+.tinycrm-btn-primary:active {
+  background-color: #005a9e;
+  border-color: #005a9e;
+}
+
+.tinycrm-btn-primary:focus {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #0078d4;
+}
+
+/* Windows Success Button */
+.tinycrm-btn-success {
+  background-color: #107c10;
+  border-color: #107c10;
+  color: #ffffff;
+}
+
+.tinycrm-btn-success:hover {
+  background-color: #0e700e;
+  border-color: #0e700e;
+}
+
+.tinycrm-btn-success:active {
+  background-color: #0c630c;
+  border-color: #0c630c;
+}
+
+.tinycrm-btn-success:focus {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #107c10;
+}
+
+/* Windows Info Button */
+.tinycrm-btn-info {
+  background-color: #8764b8;
+  border-color: #8764b8;
+  color: #ffffff;
+}
+
+.tinycrm-btn-info:hover {
+  background-color: #7c5fa6;
+  border-color: #7c5fa6;
+}
+
+.tinycrm-btn-info:active {
+  background-color: #715995;
+  border-color: #715995;
+}
+
+.tinycrm-btn-info:focus {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #8764b8;
+}
+
+/* Windows Default Button */
+.tinycrm-btn-default {
+  background-color: #f3f2f1;
+  border-color: #8a8886;
+  color: #323130;
+}
+
+.tinycrm-btn-default:hover {
+  background-color: #edebe9;
+  border-color: #8a8886;
+  color: #201f1e;
+}
+
+.tinycrm-btn-default:active {
+  background-color: #e1dfdd;
+  border-color: #8a8886;
+  color: #201f1e;
+}
+
+.tinycrm-btn-default:focus {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #605e5c;
+}
+
+/* Windows Secondary Button (Outline) */
+.tinycrm-btn-secondary {
+  background-color: transparent;
+  border-color: #8a8886;
+  color: #323130;
+}
+
+.tinycrm-btn-secondary:hover {
+  background-color: #f3f2f1;
+  border-color: #323130;
+  color: #323130;
+}
+
+.tinycrm-btn-secondary:active {
+  background-color: #edebe9;
+  border-color: #323130;
+  color: #323130;
+}
+
+.tinycrm-btn-secondary:focus {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #605e5c;
+}
+
+/* Disabled State */
+.tinycrm-btn:disabled {
+  background-color: #f3f2f1;
+  border-color: #c8c6c4;
+  color: #a19f9d;
+  cursor: not-allowed;
+}
+
+/* Loading State */
+.tinycrm-btn.is-loading {
+  pointer-events: none;
+  opacity: 0.6;
 }
 
 .time-filters {

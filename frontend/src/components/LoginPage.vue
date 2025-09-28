@@ -1,23 +1,20 @@
 <template>
   <div class="login-container">
-    <div class="background-animation">
-      <div class="floating-shapes">
-        <div class="shape shape-1"></div>
-        <div class="shape shape-2"></div>
-        <div class="shape shape-3"></div>
-        <div class="shape shape-4"></div>
-        <div class="shape shape-5"></div>
-      </div>
-    </div>
+    <div class="background-animation"></div>
     
     <div class="login-card">
       <div class="login-header">
         <div class="logo-container">
-          <img src="/logo.png" alt="TinyCRM" class="logo" />
-          <div class="logo-glow"></div>
+          <div class="app-icon">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="48" height="48" rx="4" fill="#0078d4"/>
+              <path d="M12 16h24v2H12v-2zm0 6h20v2H12v-2zm0 6h16v2H12v-2z" fill="white"/>
+              <circle cx="36" cy="32" r="4" fill="white"/>
+            </svg>
+          </div>
         </div>
-        <h1>Welcome to TinyCRM</h1>
-        <p class="subtitle">Enterprise Customer Relationship Management</p>
+        <h1>TinyCRM</h1>
+        <p class="subtitle">Customer Relationship Management</p>
       </div>
 
       <el-tabs v-model="activeTab" class="auth-tabs" @tab-change="resetForms">
@@ -71,7 +68,7 @@
                 size="large"
                 :loading="loading"
                 @click="handleLogin"
-                class="auth-button login-button"
+                class="tinycrm-btn tinycrm-btn-primary tinycrm-btn-large"
               >
                 <el-icon v-if="!loading"><UserFilled /></el-icon>
                 {{ loading ? 'Signing in...' : 'Sign In' }}
@@ -149,6 +146,17 @@
                 show-password
                 class="enhanced-input"
               />
+              <div v-if="signupForm.password" class="password-strength">
+                <div class="strength-bar">
+                  <div 
+                    class="strength-fill" 
+                    :style="`width: ${passwordStrength.strength * 20}%; background-color: ${passwordStrength.color}`"
+                  ></div>
+                </div>
+                <span class="strength-text" :style="`color: ${passwordStrength.color}`">
+                  {{ passwordStrength.text }}
+                </span>
+              </div>
             </el-form-item>
 
             <el-form-item prop="confirmPassword" class="form-item-enhanced">
@@ -165,13 +173,35 @@
               />
             </el-form-item>
 
+            <el-form-item prop="phoneNumber" class="form-item-enhanced">
+              <el-input
+                v-model="signupForm.phoneNumber"
+                placeholder="Phone Number (Optional)"
+                prefix-icon="Phone"
+                size="large"
+                :disabled="signupLoading"
+                class="enhanced-input"
+              />
+            </el-form-item>
+
+            <el-form-item prop="company" class="form-item-enhanced">
+              <el-input
+                v-model="signupForm.company"
+                placeholder="Company (Optional)"
+                prefix-icon="Office"
+                size="large"
+                :disabled="signupLoading"
+                class="enhanced-input"
+              />
+            </el-form-item>
+
             <el-form-item>
               <el-button
                 type="primary"
                 size="large"
                 :loading="signupLoading"
                 @click="handleSignup"
-                class="auth-button signup-button"
+                class="tinycrm-btn tinycrm-btn-primary tinycrm-btn-large"
               >
                 <el-icon v-if="!signupLoading"><CirclePlus /></el-icon>
                 {{ signupLoading ? 'Creating Account...' : 'Create Account' }}
@@ -199,7 +229,7 @@
 </template>
 
 <script>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElNotification } from 'element-plus'
 import { User, Lock, UserFilled, Message, CirclePlus } from '@element-plus/icons-vue'
@@ -230,7 +260,31 @@ export default {
       firstName: '',
       lastName: '',
       password: '',
-      confirmPassword: ''
+      confirmPassword: '',
+      phoneNumber: '',
+      company: ''
+    })
+
+    const passwordStrength = computed(() => {
+      const password = signupForm.password
+      if (!password) return { strength: 0, text: '', color: '' }
+      
+      let score = 0
+      const checks = {
+        length: password.length >= 6,
+        lowercase: /[a-z]/.test(password),
+        uppercase: /[A-Z]/.test(password),
+        numbers: /\d/.test(password),
+        special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+      }
+      
+      score = Object.values(checks).filter(Boolean).length
+      
+      if (score <= 1) return { strength: 1, text: 'Weak', color: '#f56565' }
+      if (score <= 2) return { strength: 2, text: 'Fair', color: '#ed8936' }
+      if (score <= 3) return { strength: 3, text: 'Good', color: '#38a169' }
+      if (score <= 4) return { strength: 4, text: 'Strong', color: '#2b6cb0' }
+      return { strength: 5, text: 'Very Strong', color: '#553c9a' }
     })
 
     const loading = ref(false)
@@ -281,6 +335,35 @@ export default {
             }
           },
           trigger: 'blur'
+        }
+      ],
+      phoneNumber: [
+        { 
+          validator: (rule, value, callback) => {
+            if (value && value.trim()) {
+              const phoneRegex = /^[+]?[1-9]?[\d\s-()]{8,15}$/
+              if (!phoneRegex.test(value.trim())) {
+                callback(new Error('Please enter a valid phone number'))
+              } else {
+                callback()
+              }
+            } else {
+              callback()
+            }
+          }, 
+          trigger: 'blur' 
+        }
+      ],
+      company: [
+        { 
+          validator: (rule, value, callback) => {
+            if (value && value.trim() && value.trim().length < 2) {
+              callback(new Error('Company name must be at least 2 characters'))
+            } else {
+              callback()
+            }
+          }, 
+          trigger: 'blur' 
         }
       ]
     }
@@ -359,6 +442,8 @@ export default {
           firstName: signupForm.firstName.trim(),
           lastName: signupForm.lastName.trim(),
           password: signupForm.password,
+          phoneNumber: signupForm.phoneNumber.trim(),
+          company: signupForm.company.trim(),
           role: 'USER'
         })
 
@@ -433,6 +518,7 @@ export default {
       showDemoAccounts,
       loginRules,
       signupRules,
+      passwordStrength,
       handleLogin,
       handleSignup,
       resetForms,
@@ -449,102 +535,38 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #f5f5f5;
   padding: 20px;
   position: relative;
-  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Background Animation */
+/* Windows Background Pattern */
 .background-animation {
   position: absolute;
   width: 100%;
   height: 100%;
   top: 0;
   left: 0;
+  background: 
+    radial-gradient(circle at 25% 25%, rgba(0, 120, 212, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(0, 120, 212, 0.03) 0%, transparent 50%);
   z-index: 1;
 }
 
-.floating-shapes {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.shape {
-  position: absolute;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-  animation: float 20s infinite linear;
-}
-
-.shape-1 {
-  width: 80px;
-  height: 80px;
-  top: 20%;
-  left: 10%;
-  animation-delay: 0s;
-}
-
-.shape-2 {
-  width: 120px;
-  height: 120px;
-  top: 60%;
-  left: 80%;
-  animation-delay: -5s;
-}
-
-.shape-3 {
-  width: 60px;
-  height: 60px;
-  top: 80%;
-  left: 20%;
-  animation-delay: -10s;
-}
-
-.shape-4 {
-  width: 100px;
-  height: 100px;
-  top: 10%;
-  left: 70%;
-  animation-delay: -15s;
-}
-
-.shape-5 {
-  width: 40px;
-  height: 40px;
-  top: 40%;
-  left: 5%;
-  animation-delay: -7s;
-}
-
-@keyframes float {
-  0% {
-    transform: translateY(0px) rotate(0deg);
-    opacity: 0.7;
-  }
-  50% {
-    transform: translateY(-20px) rotate(180deg);
-    opacity: 0.3;
-  }
-  100% {
-    transform: translateY(0px) rotate(360deg);
-    opacity: 0.7;
-  }
-}
+/* Remove floating shapes - keep clean Windows design */
 
 .login-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border-radius: 24px;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-  padding: 48px;
+  background: #ffffff;
+  border: 1px solid #d1d1d1;
+  border-radius: 8px;
+  box-shadow: 0 4.8px 14.4px rgba(0, 0, 0, 0.18), 0 25.6px 57.6px rgba(0, 0, 0, 0.22);
+  padding: 32px;
   width: 100%;
-  max-width: 480px;
+  max-width: 400px;
   position: relative;
   z-index: 2;
-  animation: slideUp 0.8s ease-out;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: slideUp 0.3s ease-out;
 }
 
 @keyframes slideUp {
@@ -560,94 +582,71 @@ export default {
 
 .login-header {
   text-align: center;
-  margin-bottom: 40px;
-}
-
-.logo-container {
-  position: relative;
-  display: inline-block;
-  margin-bottom: 24px;
-}
-
-.logo {
-  width: 80px;
-  height: 80px;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
-  transition: transform 0.3s ease;
-}
-
-.logo-glow {
-  position: absolute;
-  top: -10px;
-  left: -10px;
-  right: -10px;
-  bottom: -10px;
-  background: radial-gradient(circle, rgba(102, 126, 234, 0.3) 0%, transparent 70%);
-  border-radius: 50%;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.5;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.8;
-  }
-}
-
-.login-header h1 {
-  color: #2c3e50;
-  font-size: 32px;
-  font-weight: 700;
-  margin: 0 0 12px 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.subtitle {
-  color: #64748b;
-  font-size: 16px;
-  font-weight: 500;
-  margin: 0;
-  opacity: 0.8;
-}
-
-/* Enhanced Tabs */
-.auth-tabs {
   margin-bottom: 32px;
 }
 
+.logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.app-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-header h1 {
+  color: #323130;
+  font-size: 28px;
+  font-weight: 600;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+.subtitle {
+  color: #605e5c;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+}
+
+/* Windows Tabs */
+.auth-tabs {
+  margin-bottom: 24px;
+}
+
 .auth-tabs :deep(.el-tabs__header) {
-  margin: 0 0 32px 0;
+  margin: 0 0 24px 0;
 }
 
 .auth-tabs :deep(.el-tabs__nav-wrap::after) {
-  display: none;
+  height: 1px;
+  background-color: #d1d1d1;
 }
 
 .auth-tabs :deep(.el-tabs__item) {
-  font-size: 16px;
-  font-weight: 600;
-  padding: 0 24px;
-  height: 48px;
-  line-height: 48px;
-  color: #64748b;
-  transition: all 0.3s ease;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 0 16px;
+  height: 32px;
+  line-height: 32px;
+  color: #605e5c;
+  transition: all 0.1s ease-in-out;
 }
 
 .auth-tabs :deep(.el-tabs__item.is-active) {
-  color: #667eea;
-  background: rgba(102, 126, 234, 0.1);
-  border-radius: 12px;
+  color: #0078d4;
+  font-weight: 600;
 }
 
 .auth-tabs :deep(.el-tabs__active-bar) {
-  display: none;
+  height: 2px;
+  background-color: #0078d4;
 }
 
 /* Enhanced Form */
@@ -712,52 +711,202 @@ export default {
   text-decoration: none;
 }
 
-/* Enhanced Buttons */
-.auth-button {
-  width: 100%;
-  height: 56px;
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 16px;
-  border: none;
-  transition: all 0.3s ease;
+/* Windows Fluent Design Button System */
+.tinycrm-btn {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 8px 16px;
+  min-width: 80px;
+  height: 32px;
+  background: transparent;
+  color: #323130;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  outline: none;
   position: relative;
+  user-select: none;
+}
+
+/* Button Sizes */
+.tinycrm-btn-small {
+  height: 24px;
+  padding: 4px 12px;
+  font-size: 12px;
+  min-width: 64px;
+}
+
+.tinycrm-btn-medium {
+  height: 32px;
+  padding: 8px 16px;
+  font-size: 14px;
+  min-width: 80px;
+}
+
+.tinycrm-btn-large {
+  height: 40px;
+  padding: 10px 20px;
+  font-size: 14px;
+  min-width: 120px;
+  width: 100%;
+}
+
+/* Windows Primary Button */
+.tinycrm-btn-primary {
+  background-color: #0078d4;
+  border-color: #0078d4;
+  color: #ffffff;
+}
+
+.tinycrm-btn-primary:hover {
+  background-color: #106ebe;
+  border-color: #106ebe;
+}
+
+.tinycrm-btn-primary:active {
+  background-color: #005a9e;
+  border-color: #005a9e;
+}
+
+.tinycrm-btn-primary:focus {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #0078d4;
+}
+
+/* Windows Success Button */
+.tinycrm-btn-success {
+  background-color: #107c10;
+  border-color: #107c10;
+  color: #ffffff;
+}
+
+.tinycrm-btn-success:hover {
+  background-color: #0e700e;
+  border-color: #0e700e;
+}
+
+.tinycrm-btn-success:active {
+  background-color: #0c630c;
+  border-color: #0c630c;
+}
+
+.tinycrm-btn-success:focus {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #107c10;
+}
+
+/* Windows Info Button */
+.tinycrm-btn-info {
+  background-color: #8764b8;
+  border-color: #8764b8;
+  color: #ffffff;
+}
+
+.tinycrm-btn-info:hover {
+  background-color: #7c5fa6;
+  border-color: #7c5fa6;
+}
+
+.tinycrm-btn-info:active {
+  background-color: #715995;
+  border-color: #715995;
+}
+
+.tinycrm-btn-info:focus {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #8764b8;
+}
+
+/* Windows Default Button */
+.tinycrm-btn-default {
+  background-color: #f3f2f1;
+  border-color: #8a8886;
+  color: #323130;
+}
+
+.tinycrm-btn-default:hover {
+  background-color: #edebe9;
+  border-color: #8a8886;
+  color: #201f1e;
+}
+
+.tinycrm-btn-default:active {
+  background-color: #e1dfdd;
+  border-color: #8a8886;
+  color: #201f1e;
+}
+
+.tinycrm-btn-default:focus {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #605e5c;
+}
+
+/* Windows Secondary Button (Outline) */
+.tinycrm-btn-secondary {
+  background-color: transparent;
+  border-color: #8a8886;
+  color: #323130;
+}
+
+.tinycrm-btn-secondary:hover {
+  background-color: #f3f2f1;
+  border-color: #323130;
+  color: #323130;
+}
+
+.tinycrm-btn-secondary:active {
+  background-color: #edebe9;
+  border-color: #323130;
+  color: #323130;
+}
+
+.tinycrm-btn-secondary:focus {
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #605e5c;
+}
+
+/* Disabled State */
+.tinycrm-btn:disabled {
+  background-color: #f3f2f1;
+  border-color: #c8c6c4;
+  color: #a19f9d;
+  cursor: not-allowed;
+}
+
+/* Loading State */
+.tinycrm-btn.is-loading {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* Password Strength Indicator */
+.password-strength {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.strength-bar {
+  flex: 1;
+  height: 4px;
+  background-color: #e2e8f0;
+  border-radius: 2px;
   overflow: hidden;
 }
 
-.login-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
-}
-
-.login-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(102, 126, 234, 0.4);
-}
-
-.signup-button {
-  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
-  box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
-}
-
-.signup-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(34, 197, 94, 0.4);
-}
-
-.auth-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
+.strength-fill {
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s;
+  transition: all 0.3s ease;
+  border-radius: 2px;
 }
 
-.auth-button:hover::before {
-  left: 100%;
+.strength-text {
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 80px;
+  text-align: right;
 }
 
 /* Demo Accounts */

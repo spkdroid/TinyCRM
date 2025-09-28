@@ -3,7 +3,13 @@
     <!-- Header Section -->
     <div class="about-header">
       <div class="logo-section">
-        <img src="/logo.png" alt="TinyCRM Logo" class="about-logo" />
+        <div class="about-app-icon">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" rx="6" fill="#0078d4"/>
+            <path d="M16 22h32v3H16v-3zm0 8h28v3H16v-3zm0 8h24v3H16v-3z" fill="white"/>
+            <circle cx="48" cy="42" r="6" fill="white"/>
+          </svg>
+        </div>
         <h1 class="app-title">TinyCRM</h1>
         <p class="app-subtitle">Enterprise Customer Relationship Management</p>
       </div>
@@ -67,10 +73,10 @@
               <div class="tech-section">
                 <h4><el-icon><Monitor /></el-icon> Frontend</h4>
                 <div class="tech-badges">
-                  <el-tag type="success" size="large">Vue.js 3</el-tag>
-                  <el-tag type="primary" size="large">Element Plus</el-tag>
-                  <el-tag type="info" size="large">Vue Router</el-tag>
-                  <el-tag type="warning" size="large">Axios</el-tag>
+                  <el-tag type="success" size="large">Modern JavaScript</el-tag>
+                  <el-tag type="primary" size="large">Component Framework</el-tag>
+                  <el-tag type="info" size="large">SPA Routing</el-tag>
+                  <el-tag type="warning" size="large">HTTP Client</el-tag>
                 </div>
               </div>
 
@@ -121,7 +127,7 @@
                   <div class="service frontend-service">
                     <el-icon class="service-icon"><Monitor /></el-icon>
                     <h4>Frontend</h4>
-                    <p>Vue.js Application</p>
+                    <p>Modern Web Application</p>
                     <small>Port: 3000</small>
                   </div>
                   <div class="connection">↔</div>

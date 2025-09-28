@@ -65,4 +65,13 @@ public class UserService {
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
+    
+    // Additional methods for profile management
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
+    }
+    
+    public User save(User user) {
+        return userRepository.save(user);
+    }
 }

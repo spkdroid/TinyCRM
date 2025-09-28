@@ -1,37 +1,13 @@
-package com.spkd.tinycrm.tinyos.entity;
+package com.spkd.tinycrm.tinyos.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "users")
-public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class UserProfileDto {
     private Long id;
-    
-    @Column(unique = true, nullable = false)
     private String username;
-    
-    @Column(unique = true, nullable = false)
     private String email;
-    
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Column(nullable = false)
-    private String password;
-    
-    @Enumerated(EnumType.STRING)
-    private Role role = Role.USER;
-    
     private String firstName;
     private String lastName;
-    private boolean active = true;
-    private LocalDateTime createdAt = LocalDateTime.now();
-    private LocalDateTime lastLoginAt;
-    
-    // Profile fields
     private String phoneNumber;
     private String address;
     private String city;
@@ -44,11 +20,49 @@ public class User {
     private String department;
     private String company;
     private LocalDateTime dateOfBirth;
-    private String timezone = "UTC";
-    private String language = "en";
-    private boolean emailNotifications = true;
-    private boolean smsNotifications = false;
+    private String timezone;
+    private String language;
+    private boolean emailNotifications;
+    private boolean smsNotifications;
+    private LocalDateTime createdAt;
+    private LocalDateTime lastLoginAt;
 
+    // Default constructor
+    public UserProfileDto() {}
+
+    // Constructor for converting from User entity
+    public UserProfileDto(Long id, String username, String email, String firstName, String lastName,
+                         String phoneNumber, String address, String city, String state, String zipCode,
+                         String country, String bio, String avatarUrl, String jobTitle, String department,
+                         String company, LocalDateTime dateOfBirth, String timezone, String language,
+                         boolean emailNotifications, boolean smsNotifications, LocalDateTime createdAt,
+                         LocalDateTime lastLoginAt) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+        this.city = city;
+        this.state = state;
+        this.zipCode = zipCode;
+        this.country = country;
+        this.bio = bio;
+        this.avatarUrl = avatarUrl;
+        this.jobTitle = jobTitle;
+        this.department = department;
+        this.company = company;
+        this.dateOfBirth = dateOfBirth;
+        this.timezone = timezone;
+        this.language = language;
+        this.emailNotifications = emailNotifications;
+        this.smsNotifications = smsNotifications;
+        this.createdAt = createdAt;
+        this.lastLoginAt = lastLoginAt;
+    }
+
+    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -73,22 +87,6 @@ public class User {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
     public String getFirstName() {
         return firstName;
     }
@@ -105,31 +103,6 @@ public class User {
         this.lastName = lastName;
     }
 
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getLastLoginAt() {
-        return lastLoginAt;
-    }
-
-    public void setLastLoginAt(LocalDateTime lastLoginAt) {
-        this.lastLoginAt = lastLoginAt;
-    }
-
-    // Profile getters and setters
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -258,7 +231,19 @@ public class User {
         this.smsNotifications = smsNotifications;
     }
 
-    public enum Role {
-        USER, ADMIN, SUPPORT
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getLastLoginAt() {
+        return lastLoginAt;
+    }
+
+    public void setLastLoginAt(LocalDateTime lastLoginAt) {
+        this.lastLoginAt = lastLoginAt;
     }
 }

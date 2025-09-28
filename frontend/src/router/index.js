@@ -5,6 +5,7 @@ import FileTicket from '../components/FileTicket.vue';
 import TicketsList from '../components/TicketsList.vue';
 import TicketComments from '../components/TicketComment.vue';
 import About from '../components/About.vue';
+import UserProfile from '../components/UserProfile.vue';
 
 const routes = [
   {
@@ -40,6 +41,12 @@ const routes = [
     path: '/about',
     name: 'About',
     component: About,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/profile',
+    name: 'UserProfile',
+    component: UserProfile,
     meta: { requiresAuth: true },
   },
   {

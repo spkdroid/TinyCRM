@@ -7,8 +7,14 @@
       <!-- Header -->
       <el-header class="app-header">
         <div class="header-left">
-          <img src="./assets/logo.png" alt="TinyCRM" class="logo" />
-          <h1 class="app-title">TinyCRM Enterprise</h1>
+          <div class="app-icon-main">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="28" height="28" rx="2" fill="#0078d4"/>
+              <path d="M7 9h14v2H7V9zm0 3h12v2H7v-2zm0 3h10v2H7v-2z" fill="white"/>
+              <circle cx="21" cy="19" r="2.5" fill="white"/>
+            </svg>
+          </div>
+          <h1 class="app-title">TinyCRM</h1>
         </div>
         <div class="header-right">
           <span class="user-name">{{ currentUser?.firstName || currentUser?.username }}</span>
@@ -181,27 +187,17 @@ body {
 }
 
 .app-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #f3f2f1;
+  border-bottom: 1px solid #d1d1d1;
+  color: #323130;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 32px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(10px);
+  padding: 0 24px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
   position: relative;
   z-index: 1000;
-}
-
-.app-header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-  pointer-events: none;
 }
 
 .header-left {
@@ -221,10 +217,11 @@ body {
 }
 
 .app-title {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 600;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #323130;
 }
 
 .header-right {
@@ -234,11 +231,11 @@ body {
 }
 
 .user-name {
-  font-size: 15px;
-  font-weight: 600;
-  color: white;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  margin-right: 4px;
+  font-size: 14px;
+  font-weight: 400;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #323130;
+  margin-right: 8px;
 }
 
 .header-right :deep(.el-avatar) {
