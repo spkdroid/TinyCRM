@@ -61,6 +61,10 @@
               <el-icon><DocumentAdd /></el-icon>
               <span>Create Ticket</span>
             </el-menu-item>
+            <el-menu-item index="/messages">
+              <el-icon><ChatDotRound /></el-icon>
+              <span>Messages</span>
+            </el-menu-item>
             <el-sub-menu index="reports">
               <template #title>
                 <el-icon><DataAnalysis /></el-icon>

@@ -8,6 +8,7 @@ import About from '../components/About.vue';
 import UserProfile from '../components/UserProfile.vue';
 import Inbox from '../components/Inbox.vue';
 import AdminUserManagement from '../components/AdminUserManagement.vue';
+import UserMessaging from '../components/UserMessaging.vue';
 
 const routes = [
   {
@@ -62,6 +63,12 @@ const routes = [
     name: 'AdminUserManagement',
     component: AdminUserManagement,
     meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: '/messages',
+    name: 'UserMessaging',
+    component: UserMessaging,
+    meta: { requiresAuth: true },
   },
   {
     path: '/reports/overview',
