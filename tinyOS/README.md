@@ -81,77 +81,30 @@ The Support Module provides RESTful endpoints for managing support tickets, tick
 - **Description**: Creates a new ticket comment.
 - **Request Body**:
   - `TicketComment` (JSON): The details of the ticket comment to be created.
-- **Response**:
-  - `201 Created`: Returns the created ticket comment.
+## TinyCRM Backend (tinyOS)
 
-#### Update an Existing Comment
-- **URL**: `/api/comments/{id}`
-- **Method**: `PUT`
-- **Description**: Updates an existing ticket comment.
-- **Parameters**:
-  - `id` (path): The ID of the ticket comment.
-- **Request Body**:
-  - `TicketComment` (JSON): The updated details of the ticket comment.
-- **Response**:
-  - `200 OK`: Returns the updated ticket comment.
-  - `404 Not Found`: If the comment does not exist.
+All consolidated documentation (architecture, API overview, auth model, environment, deployment) now lives in the root `README.md`.
 
-#### Delete a Comment
-- **URL**: `/api/comments/{id}`
-- **Method**: `DELETE`
-- **Description**: Deletes a ticket comment by its ID.
-- **Parameters**:
-  - `id` (path): The ID of the ticket comment.
-- **Response**:
-  - `204 No Content`: If the deletion was successful.
-  - `404 Not Found`: If the comment does not exist.
+This folder contains the Spring Boot service providing:
+- Ticket + Comment REST endpoints
+- User + Session management
+- Data initialization (demo users)
+- CORS + Web config
 
-### Users
+Quick run:
+```
+./gradlew bootRun
+```
 
-#### Get All Users
-- **URL**: `/api/users`
-- **Method**: `GET`
-- **Description**: Retrieves a list of all users.
-- **Response**:
-  - `200 OK`: Returns a list of all users.
+Selected endpoints (see controllers for full list):
+```
+GET  /api/tickets
+POST /api/tickets
+GET  /api/comments/ticket/{ticketId}
+POST /api/auth/login
+GET  /api/auth/me
+```
 
-#### Get User by ID
-- **URL**: `/api/users/{id}`
-- **Method**: `GET`
-- **Description**: Retrieves a user by their ID.
-- **Parameters**:
-  - `id` (path): The ID of the user.
-- **Response**:
-  - `200 OK`: Returns the user with the specified ID.
-  - `404 Not Found`: If the user does not exist.
+Refer to the unified root README for full API descriptions and extension guidance.
 
-#### Create a New User
-- **URL**: `/api/users`
-- **Method**: `POST`
-- **Description**: Creates a new user.
-- **Request Body**:
-  - `User` (JSON): The details of the user to be created.
-- **Response**:
-  - `201 Created`: Returns the created user.
-
-#### Update an Existing User
-- **URL**: `/api/users/{id}`
-- **Method**: `PUT`
-- **Description**: Updates an existing user.
-- **Parameters**:
-  - `id` (path): The ID of the user.
-- **Request Body**:
-  - `User` (JSON): The updated details of the user.
-- **Response**:
-  - `200 OK`: Returns the updated user.
-  - `404 Not Found`: If the user does not exist.
-
-#### Delete a User
-- **URL**: `/api/users/{id}`
-- **Method**: `DELETE`
-- **Description**: Deletes a user by their ID.
-- **Parameters**:
-  - `id` (path): The ID of the user.
-- **Response**:
-  - `204 No Content`: If the deletion was successful.
-  - `404 Not Found`: If the user does not exist.
+–– Centralized to avoid duplication.

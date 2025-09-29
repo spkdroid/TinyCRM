@@ -1,24 +1,18 @@
-# frontend
+## TinyCRM Frontend
 
-## Project setup
+The main project documentation now lives in the root `README.md`.
+
+This directory contains the Vue 3 + Element Plus single-page application.
+
+Quick commands:
 ```
 npm install
+npm run serve   # Dev server
+npm run build   # Production build
+npm run lint    # Lint
 ```
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+For architecture, API usage, environment variables, deployment, and troubleshooting, see the root README.
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+––
+Maintained centrally to avoid doc drift.
