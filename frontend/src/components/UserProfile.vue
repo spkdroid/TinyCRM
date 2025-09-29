@@ -459,10 +459,10 @@ export default {
 
     const handleAvatarUpload = async (params) => {
       const formData = new FormData()
-      formData.append('avatar', params.file)
+      formData.append('file', params.file)
       
       try {
-        const response = await axios.post('/api/profile/avatar', formData, {
+        const response = await axios.post('/api/profile/upload-avatar', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -471,6 +471,7 @@ export default {
         if (response.data.success) {
           profileData.avatarUrl = response.data.avatarUrl
           ElMessage.success('Avatar uploaded successfully!')
+          showAvatarUpload.value = false
         } else {
           ElMessage.error(response.data.message || 'Failed to upload avatar')
         }
