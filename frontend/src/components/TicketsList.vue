@@ -159,11 +159,13 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="assignedTo" label="Assignee" width="120">
+        <el-table-column prop="assignee" label="Assignee" width="150">
           <template #default="scope">
-            <div v-if="scope.row.assignedTo" class="assignee-cell">
-              <el-avatar :size="24" :src="getAvatarUrl(scope.row.assignedTo)" />
-              <span>{{ scope.row.assignedTo }}</span>
+            <div v-if="scope.row.assignee" class="assignee-cell">
+              <el-avatar :size="24" :src="scope.row.assignee.avatarUrl">
+                <el-icon><User /></el-icon>
+              </el-avatar>
+              <span>{{ scope.row.assignee.firstName }} {{ scope.row.assignee.lastName }}</span>
             </div>
             <el-tag v-else type="info" size="small">Unassigned</el-tag>
           </template>

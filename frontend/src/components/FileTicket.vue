@@ -84,11 +84,24 @@
                 style="width: 100%"
                 :prefix-icon="User"
                 clearable
+                filterable
+                :loading="loadingUsers"
               >
                 <el-option label="Auto-assign" value="" />
-                <el-option label="John Smith (Support)" value="john.smith" />
-                <el-option label="Sarah Wilson (Tech Lead)" value="sarah.wilson" />
-                <el-option label="Mike Johnson (Developer)" value="mike.johnson" />
+                <el-option
+                  v-for="user in availableUsers"
+                  :key="user.id"
+                  :label="`${user.firstName} ${user.lastName} (${user.username})`"
+                  :value="user.id"
+                >
+                  <div class="user-option">
+                    <el-avatar :size="24" :src="user.avatarUrl">
+                      <el-icon><User /></el-icon>
+                    </el-avatar>
+                    <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
+                    <span class="user-role">{{ user.role }}</span>
+                  </div>
+                </el-option>
               </el-select>
             </el-form-item>
           </el-col>
@@ -220,6 +233,8 @@ export default {
       submitting: false,
       inputVisible: false,
       inputValue: '',
+      loadingUsers: false,
+      availableUsers: [],
       uploadUrl: `${this.$http.defaults.baseURL}/api/upload`,
       ticketForm: {
         subject: '',
@@ -248,7 +263,34 @@ export default {
       }
     }
   },
+  async mounted() {
+    await this.loadAvailableUsers()
+    
+    // Load draft if exists
+    const draft = localStorage.getItem('ticketDraft')
+    if (draft) {
+      const draftData = JSON.parse(draft)
+      this.ticketForm = { ...this.ticketForm, ...draftData }
+    }
+  },
   methods: {
+    async loadAvailableUsers() {
+      try {
+        this.loadingUsers = true
+        const response = await this.$http.get('/api/tickets/assignable-users')
+        
+        if (response.data.success) {
+          this.availableUsers = response.data.users
+        } else {
+          ElMessage.error('Failed to load assignable users')
+        }
+      } catch (error) {
+        console.error('Error loading users:', error)
+        ElMessage.error('Failed to load assignable users')
+      } finally {
+        this.loadingUsers = false
+      }
+    },
     async submitTicket() {
       try {
         const valid = await this.$refs.ticketForm.validate()
@@ -261,7 +303,7 @@ export default {
           description: this.ticketForm.description,
           priority: this.ticketForm.priority,
           category: this.ticketForm.category,
-          assignedTo: this.ticketForm.assignedTo || null,
+          assigneeId: this.ticketForm.assignedTo || null,
           tags: this.ticketForm.tags,
           status: 'Open'
         }
@@ -334,14 +376,6 @@ export default {
     },
     handleUploadError() {
       ElMessage.error('File upload failed')
-    }
-  },
-  mounted() {
-    // Load draft if exists
-    const draft = localStorage.getItem('ticketDraft')
-    if (draft) {
-      const draftData = JSON.parse(draft)
-      this.ticketForm = { ...this.ticketForm, ...draftData }
     }
   }
 }
@@ -423,6 +457,23 @@ export default {
 :deep(.el-form-item__label) {
   font-weight: 600;
   color: #303133;
+}
+
+.user-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-name {
+  font-weight: 500;
+  flex: 1;
+}
+
+.user-role {
+  font-size: 12px;
+  color: #909399;
+  text-transform: uppercase;
 }
 
 :deep(.el-input__inner) {

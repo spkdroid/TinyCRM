@@ -10,9 +10,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/profile")
@@ -209,6 +215,172 @@ public class UserProfileController {
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
             response.put("message", "Error retrieving profile: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    @PostMapping("/upload-avatar")
+    public ResponseEntity<Map<String, Object>> uploadProfilePicture(
+            @RequestParam("file") MultipartFile file,
+            HttpServletRequest request) {
+        try {
+            HttpSession session = request.getSession(false);
+            Map<String, Object> response = new HashMap<>();
+            
+            if (session == null || session.getAttribute("userId") == null) {
+                response.put("success", false);
+                response.put("message", "User not authenticated");
+                return ResponseEntity.status(401).body(response);
+            }
+            
+            Long userId = (Long) session.getAttribute("userId");
+            
+            if (file.isEmpty()) {
+                response.put("success", false);
+                response.put("message", "Please select a file to upload");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // Validate file type
+            String contentType = file.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                response.put("success", false);
+                response.put("message", "Only image files are allowed");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // Validate file size (max 5MB)
+            if (file.getSize() > 5 * 1024 * 1024) {
+                response.put("success", false);
+                response.put("message", "File size must be less than 5MB");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            Optional<User> userOptional = userService.findById(userId);
+            if (userOptional.isEmpty()) {
+                response.put("success", false);
+                response.put("message", "User not found");
+                return ResponseEntity.status(404).body(response);
+            }
+            
+            User user = userOptional.get();
+            
+            // Create uploads directory if it doesn't exist
+            String uploadDir = "uploads/avatars/";
+            Path uploadPath = Paths.get(uploadDir);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+            
+            // Generate unique filename
+            String originalFilename = file.getOriginalFilename();
+            String fileExtension = originalFilename != null && originalFilename.contains(".") 
+                    ? originalFilename.substring(originalFilename.lastIndexOf(".")) 
+                    : ".jpg";
+            String filename = "avatar_" + userId + "_" + UUID.randomUUID() + fileExtension;
+            
+            // Save file
+            Path filePath = uploadPath.resolve(filename);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            
+            // Update user avatar URL
+            String avatarUrl = "/api/profile/avatar/" + filename;
+            user.setAvatarUrl(avatarUrl);
+            userService.save(user);
+            
+            response.put("success", true);
+            response.put("message", "Profile picture uploaded successfully");
+            response.put("avatarUrl", avatarUrl);
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (IOException e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Error uploading file: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Error uploading profile picture: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    @GetMapping("/avatar/{filename}")
+    public ResponseEntity<byte[]> getProfilePicture(@PathVariable String filename) {
+        try {
+            Path filePath = Paths.get("uploads/avatars/" + filename);
+            
+            if (!Files.exists(filePath)) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            byte[] fileContent = Files.readAllBytes(filePath);
+            String contentType = Files.probeContentType(filePath);
+            
+            if (contentType == null) {
+                contentType = "image/jpeg";
+            }
+            
+            return ResponseEntity.ok()
+                    .header("Content-Type", contentType)
+                    .body(fileContent);
+                    
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @DeleteMapping("/avatar")
+    public ResponseEntity<Map<String, Object>> deleteProfilePicture(HttpServletRequest request) {
+        try {
+            HttpSession session = request.getSession(false);
+            Map<String, Object> response = new HashMap<>();
+            
+            if (session == null || session.getAttribute("userId") == null) {
+                response.put("success", false);
+                response.put("message", "User not authenticated");
+                return ResponseEntity.status(401).body(response);
+            }
+            
+            Long userId = (Long) session.getAttribute("userId");
+            Optional<User> userOptional = userService.findById(userId);
+            
+            if (userOptional.isEmpty()) {
+                response.put("success", false);
+                response.put("message", "User not found");
+                return ResponseEntity.status(404).body(response);
+            }
+            
+            User user = userOptional.get();
+            
+            // Remove avatar file if exists
+            if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
+                String filename = user.getAvatarUrl().substring(user.getAvatarUrl().lastIndexOf("/") + 1);
+                Path filePath = Paths.get("uploads/avatars/" + filename);
+                
+                try {
+                    Files.deleteIfExists(filePath);
+                } catch (IOException e) {
+                    // Log the error but don't fail the request
+                    System.err.println("Could not delete avatar file: " + e.getMessage());
+                }
+            }
+            
+            // Update user to remove avatar URL
+            user.setAvatarUrl(null);
+            userService.save(user);
+            
+            response.put("success", true);
+            response.put("message", "Profile picture deleted successfully");
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Error deleting profile picture: " + e.getMessage());
             return ResponseEntity.internalServerError().body(response);
         }
     }

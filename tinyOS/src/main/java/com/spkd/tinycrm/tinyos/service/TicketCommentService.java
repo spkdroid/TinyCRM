@@ -38,4 +38,8 @@ public class TicketCommentService {
     public void deleteComment(Long id) {
         ticketCommentRepository.deleteById(id);
     }
+
+    public List<TicketComment> getCommentsByTicketId(Long ticketId) {
+        return ticketCommentRepository.findBySupportTicketIdOrderByCreatedDateAsc(ticketId);
+    }
 }

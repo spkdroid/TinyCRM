@@ -5,6 +5,7 @@ import com.spkd.tinycrm.tinyos.entity.SupportTicket;
 import com.spkd.tinycrm.tinyos.entity.User;
 import com.spkd.tinycrm.tinyos.service.AuthenticationService;
 import com.spkd.tinycrm.tinyos.service.SupportTicketService;
+import com.spkd.tinycrm.tinyos.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/tickets")
+@CrossOrigin(origins = {"http://localhost:3000", "http://frontend:8080"})
 public class SupportTicketController {
 
     @Autowired
@@ -25,6 +27,9 @@ public class SupportTicketController {
     
     @Autowired
     private AuthenticationService authenticationService;
+    
+    @Autowired
+    private UserService userService;
 
     @GetMapping
     public ResponseEntity<?> getAllTickets(HttpServletRequest request) {
@@ -149,6 +154,86 @@ public class SupportTicketController {
             }
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(createErrorResponse("Error updating ticket: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/assignable-users")
+    public ResponseEntity<?> getAssignableUsers(HttpServletRequest request) {
+        Optional<User> userOpt = validateSession(request);
+        if (!userOpt.isPresent()) {
+            return ResponseEntity.status(401).body(createErrorResponse("Authentication required"));
+        }
+        
+        try {
+            List<User> users = userService.getAllUsers();
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("users", users);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(createErrorResponse("Error fetching assignable users: " + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{id}/assign")
+    public ResponseEntity<?> assignTicket(@PathVariable Long id, @RequestBody Map<String, Object> assignmentData, HttpServletRequest request) {
+        Optional<User> userOpt = validateSession(request);
+        if (!userOpt.isPresent()) {
+            return ResponseEntity.status(401).body(createErrorResponse("Authentication required"));
+        }
+        
+        try {
+            Long assigneeId = null;
+            if (assignmentData.get("assigneeId") != null) {
+                assigneeId = Long.valueOf(assignmentData.get("assigneeId").toString());
+            }
+            
+            Optional<SupportTicket> ticketOpt = supportTicketService.getTicketById(id);
+            if (!ticketOpt.isPresent()) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            SupportTicket ticket = ticketOpt.get();
+            
+            if (assigneeId != null) {
+                Optional<User> assigneeOpt = userService.findById(assigneeId);
+                if (!assigneeOpt.isPresent()) {
+                    return ResponseEntity.badRequest().body(createErrorResponse("Assignee not found"));
+                }
+                ticket.setAssignee(assigneeOpt.get());
+            } else {
+                ticket.setAssignee(null);
+            }
+            
+            SupportTicket updatedTicket = supportTicketService.updateTicket(id, ticket);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", assigneeId != null ? "Ticket assigned successfully" : "Ticket unassigned successfully");
+            response.put("ticket", updatedTicket);
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(createErrorResponse("Error assigning ticket: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<?> getTicketComments(@PathVariable Long id, HttpServletRequest request) {
+        Optional<User> userOpt = validateSession(request);
+        if (!userOpt.isPresent()) {
+            return ResponseEntity.status(401).body(createErrorResponse("Authentication required"));
+        }
+        
+        try {
+            // This will be handled by the TicketCommentController, but keeping for compatibility
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Please use /api/comments/ticket/" + id + " endpoint");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(createErrorResponse("Error: " + e.getMessage()));
         }
     }
 

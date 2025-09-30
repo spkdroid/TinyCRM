@@ -6,6 +6,9 @@ import TicketsList from '../components/TicketsList.vue';
 import TicketComments from '../components/TicketComment.vue';
 import About from '../components/About.vue';
 import UserProfile from '../components/UserProfile.vue';
+import Inbox from '../components/Inbox.vue';
+import AdminUserManagement from '../components/AdminUserManagement.vue';
+import UserMessaging from '../components/UserMessaging.vue';
 
 const routes = [
   {
@@ -47,6 +50,24 @@ const routes = [
     path: '/profile',
     name: 'UserProfile',
     component: UserProfile,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/inbox',
+    name: 'Inbox',
+    component: Inbox,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/admin/users',
+    name: 'AdminUserManagement',
+    component: AdminUserManagement,
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: '/messages',
+    name: 'UserMessaging',
+    component: UserMessaging,
     meta: { requiresAuth: true },
   },
   {

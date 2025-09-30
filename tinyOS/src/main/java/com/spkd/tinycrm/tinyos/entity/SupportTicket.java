@@ -4,19 +4,30 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
+@Table(name = "support_ticket")
 public class SupportTicket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
 
     private String subject;
     private String description;
     private String status;
     private String priority;
     private String category;
+    
+    // Keep backward compatibility with string fields
     private String createdBy;
     private String assignedTo;
+    
+    // Add proper User relationships
+    @ManyToOne
+    @JoinColumn(name = "creator_id")
+    private User creator;
+    
+    @ManyToOne
+    @JoinColumn(name = "assignee_id")
+    private User assignee;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
@@ -103,5 +114,31 @@ public class SupportTicket {
 
     public void setUpdatedDate(Date updatedDate) {
         this.updatedDate = updatedDate;
+    }
+
+    public User getCreator() {
+        return creator;
+    }
+
+    public void setCreator(User creator) {
+        this.creator = creator;
+        // Keep backward compatibility
+        if (creator != null) {
+            this.createdBy = creator.getUsername();
+        }
+    }
+
+    public User getAssignee() {
+        return assignee;
+    }
+
+    public void setAssignee(User assignee) {
+        this.assignee = assignee;
+        // Keep backward compatibility
+        if (assignee != null) {
+            this.assignedTo = assignee.getUsername();
+        } else {
+            this.assignedTo = null;
+        }
     }
 }
