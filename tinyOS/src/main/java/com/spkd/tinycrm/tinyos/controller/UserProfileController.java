@@ -266,7 +266,7 @@ public class UserProfileController {
             User user = userOptional.get();
             
             // Create uploads directory if it doesn't exist
-            String uploadDir = "uploads/avatars/";
+            String uploadDir = "/tmp/uploads/avatars/";
             Path uploadPath = Paths.get(uploadDir);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
@@ -310,7 +310,7 @@ public class UserProfileController {
     @GetMapping("/avatar/{filename}")
     public ResponseEntity<byte[]> getProfilePicture(@PathVariable String filename) {
         try {
-            Path filePath = Paths.get("uploads/avatars/" + filename);
+            Path filePath = Paths.get("/tmp/uploads/avatars/" + filename);
             
             if (!Files.exists(filePath)) {
                 return ResponseEntity.notFound().build();
@@ -358,7 +358,7 @@ public class UserProfileController {
             // Remove avatar file if exists
             if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
                 String filename = user.getAvatarUrl().substring(user.getAvatarUrl().lastIndexOf("/") + 1);
-                Path filePath = Paths.get("uploads/avatars/" + filename);
+                Path filePath = Paths.get("/tmp/uploads/avatars/" + filename);
                 
                 try {
                     Files.deleteIfExists(filePath);

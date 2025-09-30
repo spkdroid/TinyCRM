@@ -311,12 +311,26 @@ public class UserMessageController {
             Long currentUserId = (Long) session.getAttribute("userId");
             List<User> allUsers = userService.getAllUsers();
             
-            // Remove current user from the list
-            allUsers.removeIf(user -> user.getId().equals(currentUserId));
+            // Remove current user from the list and convert to DTOs
+            List<Map<String, Object>> userDtos = allUsers.stream()
+                .filter(user -> !user.getId().equals(currentUserId))
+                .map(user -> {
+                    Map<String, Object> userDto = new HashMap<>();
+                    userDto.put("id", user.getId());
+                    userDto.put("username", user.getUsername());
+                    userDto.put("firstName", user.getFirstName());
+                    userDto.put("lastName", user.getLastName());
+                    userDto.put("email", user.getEmail());
+                    userDto.put("avatarUrl", user.getAvatarUrl());
+                    userDto.put("jobTitle", user.getJobTitle());
+                    userDto.put("department", user.getDepartment());
+                    return userDto;
+                })
+                .collect(java.util.stream.Collectors.toList());
             
             response.put("success", true);
-            response.put("users", allUsers);
-            response.put("totalUsers", allUsers.size());
+            response.put("users", userDtos);
+            response.put("totalUsers", userDtos.size());
             
             return ResponseEntity.ok(response);
             

@@ -166,9 +166,25 @@ public class SupportTicketController {
         
         try {
             List<User> users = userService.getAllUsers();
+            List<Map<String, Object>> userDtos = users.stream()
+                .map(user -> {
+                    Map<String, Object> userDto = new HashMap<>();
+                    userDto.put("id", user.getId());
+                    userDto.put("username", user.getUsername());
+                    userDto.put("firstName", user.getFirstName());
+                    userDto.put("lastName", user.getLastName());
+                    userDto.put("email", user.getEmail());
+                    userDto.put("role", user.getRole().toString());
+                    userDto.put("avatarUrl", user.getAvatarUrl());
+                    userDto.put("jobTitle", user.getJobTitle());
+                    userDto.put("department", user.getDepartment());
+                    return userDto;
+                })
+                .collect(java.util.stream.Collectors.toList());
+                
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
-            response.put("users", users);
+            response.put("users", userDtos);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(createErrorResponse("Error fetching assignable users: " + e.getMessage()));
